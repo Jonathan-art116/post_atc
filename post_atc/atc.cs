@@ -51,22 +51,28 @@ namespace post_atc
         {
             if(textBox1.Text.Length == 0)
             {
-                MessageBox.Show("请输入SN号");
-                
+                MessageBox.Show("请输入正确SN");
             }
             else
             {
                 try
                 {
                     cnn.Open();
-                    //MessageBox.Show("连接成功");
                     string sn = textBox1.Text;
-                    string post = "update atc set LED = 'Pass' where SN=" + sn;
-                    MySqlCommand cmd = new MySqlCommand(post, cnn);
-                    int result = cmd.ExecuteNonQuery();
-                    MessageBox.Show("上传成功!测试结果为Pass.");
-                    cnn.Close();
-                    textBox1.Text = "";
+                    string select_sn = "select * from atc where SN = " + sn + " and LED ='Pass'";
+                    MySqlCommand cmd1 = new MySqlCommand(select_sn, cnn);
+                    if (cmd1.ExecuteScalar() == null)
+                    {
+                        MessageBox.Show("功能测试未完成");
+                    }
+                    else
+                    {
+                        string post = "update atc set GPS = 'ok' where SN=" + sn;
+                        MySqlCommand cmd = new MySqlCommand(post, cnn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("上传成功!测试结果为Pass.");
+                        textBox1.Text = "";
+                    }
                 }
                 catch (MySqlException ex)
                 {
@@ -90,14 +96,21 @@ namespace post_atc
                 try
                 {
                     cnn.Open();
-                    //MessageBox.Show("连接成功");
                     string sn = textBox1.Text;
-                    string post = "update atc set LED = 'Fail' where SN=" + sn;
-                    MySqlCommand cmd = new MySqlCommand(post, cnn);
-                    int result = cmd.ExecuteNonQuery();
-                    MessageBox.Show("上传成功!测试结果为Fail.");
-                    cnn.Close();
-                    textBox1.Text = "";
+                    string select_sn = "select * from atc where SN = " + sn + " and LED ='Pass'";
+                    MySqlCommand cmd1 = new MySqlCommand(select_sn, cnn);
+                    if (cmd1.ExecuteScalar() == null)
+                    {
+                        MessageBox.Show("功能测试未完成");
+                    }
+                    else
+                    {
+                        string post = "update atc set GPS = 'xx' where SN=" + sn;
+                        MySqlCommand cmd = new MySqlCommand(post, cnn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("上传成功!测试结果为Fail.");
+                        textBox1.Text = "";
+                    }
                 }
                 catch (MySqlException ex)
                 {
