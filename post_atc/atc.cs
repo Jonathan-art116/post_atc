@@ -20,6 +20,13 @@ namespace post_atc
             InitializeComponent();
         }
 
+        class read_config
+        {
+            public static string tbname;
+            public static string result1 = "'Pass'";
+            //public static string result2 = "'Fail'";
+        }
+  
         string connectString = null;
         MySqlConnection cnn;
         public void atc_Load(object sender, EventArgs e)
@@ -36,7 +43,7 @@ namespace post_atc
             string[] port = config[13].Split('=');
             string pot = port[1];
             string[] tablename = config[14].Split('=');
-            string tbname = tablename[1];
+            read_config.tbname = tablename[1];
             connectString = "server=" + ip + ";database=" + dbname + ";uid=" + usname + ";pwd=" + pswd + ";port=" + pot;
             cnn = new MySqlConnection(connectString);
         }
@@ -44,14 +51,14 @@ namespace post_atc
        
         public void textBox1_TextChanged(object sender, EventArgs e)
         {
-
+            
         }
 
         public void button1_Click(object sender, EventArgs e)
         {
             if(textBox1.Text.Length == 0)
             {
-                MessageBox.Show("请输入正确SN");
+                MessageBox.Show("请输入正确的SN");
             }
             else
             {
@@ -59,15 +66,15 @@ namespace post_atc
                 {
                     cnn.Open();
                     string sn = textBox1.Text;
-                    string select_sn = "select * from atc where SN = " + sn + " and LED ='Pass'";
+                    string select_sn = "select * from " + read_config.tbname + " where SN=" + "'" + sn + "'" + " and FullTestResult=" + read_config.result1;
                     MySqlCommand cmd1 = new MySqlCommand(select_sn, cnn);
                     if (cmd1.ExecuteScalar() == null)
                     {
-                        MessageBox.Show("功能测试未完成");
+                        MessageBox.Show("整机功能测试未完成");
                     }
                     else
                     {
-                        string post = "update atc set GPS = 'ok' where SN=" + sn;
+                        string post = "update "+ read_config.tbname + " set TestCaseATC = 'Pass' where SN=" + "'" + sn + "'";
                         MySqlCommand cmd = new MySqlCommand(post, cnn);
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("上传成功!测试结果为Pass.");
@@ -89,7 +96,7 @@ namespace post_atc
         {
             if (textBox1.Text.Length == 0)
             {
-                MessageBox.Show("请输入SN号");
+                MessageBox.Show("请输入正确SN号");
             }
             else
             {
@@ -97,15 +104,15 @@ namespace post_atc
                 {
                     cnn.Open();
                     string sn = textBox1.Text;
-                    string select_sn = "select * from atc where SN = " + sn + " and LED ='Pass'";
+                    string select_sn = "select * from "+ read_config.tbname + " where SN = " + "'" + sn + "'" + " and FullTestResult =" + read_config.result1;
                     MySqlCommand cmd1 = new MySqlCommand(select_sn, cnn);
                     if (cmd1.ExecuteScalar() == null)
                     {
-                        MessageBox.Show("功能测试未完成");
+                        MessageBox.Show("整机功能测试未完成");
                     }
                     else
                     {
-                        string post = "update atc set GPS = 'xx' where SN=" + sn;
+                        string post = "update "+ read_config.tbname + " set TestCaseATC = 'Fail' where SN=" + "'" + sn +"'";
                         MySqlCommand cmd = new MySqlCommand(post, cnn);
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("上传成功!测试结果为Fail.");
